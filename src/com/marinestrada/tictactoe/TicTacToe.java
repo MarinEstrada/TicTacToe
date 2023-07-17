@@ -9,6 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.awt.Font;// to be able to specify fonts
+import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 //importing to get images
@@ -16,6 +18,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.awt.Color;
 import java.awt.Dimension;
 
 import java.awt.event.MouseListener;
@@ -119,6 +122,40 @@ public class TicTacToe implements Runnable{
     }
 
     private class Painter extends JPanel implements MouseListener{
+        private static final long serialVersionUID = 1L;
+
+        public Painter(){
+            setFocusable(true);
+            requestFocus();
+            setBackground(Color.WHITE);
+            addMouseListener(this); //note how this class extends MouseListener
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            render(g);
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e){
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e){
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e){
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e){
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e){
+        }
 
     }
 }
