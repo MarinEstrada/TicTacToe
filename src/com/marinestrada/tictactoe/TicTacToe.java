@@ -1,7 +1,7 @@
 package com.marinestrada.tictactoe;
 //required packages for importation
 import java.util.Scanner;
-import javax.swing.*;
+import javax.swing.JPanel;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
@@ -9,12 +9,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.awt.Font;// to be able to specify fonts
+import java.awt.event.MouseListener;
 
 //importing to get images
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.awt.Dimension;
+
+import java.awt.event.MouseListener;
 
 //by immplementing runnable a runnable object is used by default
 public class TicTacToe implements Runnable{
@@ -85,6 +89,10 @@ public class TicTacToe implements Runnable{
 
         //next step is to load images
         loadImages();
+
+        painter = new Painter();
+        painter.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
     }
 
     //required when implemting runable
@@ -110,7 +118,7 @@ public class TicTacToe implements Runnable{
         TicTacToe ticTacToe = new TicTacToe();
     }
 
-    public class Painter{
+    private class Painter extends JPanel implements MouseListener{
 
     }
 }
