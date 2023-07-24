@@ -163,7 +163,7 @@ public class TicTacToe implements Runnable{
     private void listenForServerRequest() {
         Socket socket = null;
         try{
-            socket = serverSocket.accept();
+            socket = serverSocket.accept(); // will block
             dos = new DataOutputStream(socket.getOutputStream())
             dis = new DataInputStream(socket.getInputStream());
             accepted = true;
