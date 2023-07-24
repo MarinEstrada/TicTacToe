@@ -12,6 +12,8 @@ import java.net.Socket;
 
 import java.awt.Font;// to be able to specify fonts
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -21,6 +23,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 
@@ -53,7 +56,7 @@ public class TicTacToe implements Runnable{
     //gui stuff
     private BufferedImage board;
     private BufferedImage redX;
-    private BufferedImage BlueX;
+    private BufferedImage blueX;
     private BufferedImage redCircle;
     private BufferedImage blueCircle;
 
@@ -127,7 +130,61 @@ public class TicTacToe implements Runnable{
     }
 
     private void render(Graphics g){
+        g.drawImage(board, 0,0,null);
+        if (unableToCommunicatewithOpponent) {
+            g.setColor(Color.RED);
+            g.setFont(smallerFont);
+            Graphics2D g2 = (Graphics2D) g; // casting graphics to child class 
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            //tells us how long string is in the font we are using
+            int stringWidth = g2.getFontMetrics().stringWidth(unableToCommunicateWithOppStr);
+            g.drawString(unableToCommunicateWithOppStr,WIDTH/2 - stringWidth/2, HEIGHT/2);
+            return; //if unable to commun, do not render anything else
+        }
 
+        if(accepted){
+            for(int i = o; i<spaces.length; i++) {
+                if(spaces[i].equals("X")) {
+                    if(circle) { // if we are cirlce, render the following
+                        //is ensureing image is drawn on correct box of the screen
+                        g.drawImage(redX, (i %3) * lengthOfSpace +10 *(i%3), (int) (i/3) * lengthOfSpace + 10* (int) (i/3), null);
+                    } else { //otherwise we are X, render the following
+                        g.drawImage(blueX, (i %3) * lengthOfSpace +10 *(i%3), (int) (i/3) * lengthOfSpace + 10* (int) (i/3), null);
+                    }
+                }else if (spaces[i].equals("O")) {
+                    if(circle){
+                        g.drawImage(blueCircle, (i %3) * lengthOfSpace +10 *(i%3), (int) (i/3) * lengthOfSpace + 10* (int) (i/3), null);
+                    } else { //otherwise we are X, render the following
+                        g.drawImage(redCircle, (i %3) * lengthOfSpace +10 *(i%3), (int) (i/3) * lengthOfSpace + 10* (int) (i/3), null);
+                    }
+                }
+            }
+            if(won || enemyWon) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setStroke(new BasicStroke(10)); //setting width of line that will mark set of 3 in a row
+                g.setColor(Color.BLACK);
+                //rendering the line from first spot to second spot
+                g.drawLine(firstSpot % 3 * lengthOfSpace+10 * firstSpot % 3 + lengthOfSpace/2, (int) (firstSpot /3)*lengthOfSpace + 10 * (int) (firstSpot/3) + lengthOfSpace/2,
+                    secondSpot % 3 * lengthOfSpace + 10 * secondSpot %3 + lengthOfSpace /2, (int) (secondSpot/3) * lengthOfSpace + 10 * (int) (secondSpot/3) + lengthOfSpace/2);
+
+                g.setColor(Color.RED);
+                g.setFont(largerFont);
+                if(won) {
+                    int stringWidth = g2.getFontMetrics().stringWidth(wonString);
+                    g.drawString(wonString, WIDTH /2 - stringWidth/2, HEIGHT/2);
+                } else { //enemy won
+                    int stringWidth = g2.getFontMetrics().stringWidth(enemyWonString);
+                    g.drawString(enemyWonString, WIDTH /2 - stringWidth/2, HEIGHT/2);
+                }
+            }
+        } else { //we have not accepted
+            g.setColor(Color.RED);
+            g.setFont(font);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            int stringWidth = g2.getFontMetrics().stringWidth(waitingString);
+            g.drawString(waitingString, WIDTH/2 - stringWidth/2, HEIGHT/2);
+        }
     }
 
     private void tick(){
