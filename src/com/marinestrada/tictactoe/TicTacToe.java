@@ -133,6 +133,19 @@ public class TicTacToe implements Runnable{
     private void tick(){
         if(errors >= 10) unableToCommunicatewithOpponent = true;
         
+        if(!yourTurn && !unableToCommunicatewithOpponent) {
+            try{
+                int space = dis.readInt();
+                if(circle) spaces[space] = "X";
+                else spaces[space] = "O";
+                checkForEnemyWin();
+                checkForTie();
+                yourTurn = true;
+            } catch(IOException e) {
+                e.printStackTrace();
+                errors++;
+            }
+        }
     }
 
     private void checkForWin() {
