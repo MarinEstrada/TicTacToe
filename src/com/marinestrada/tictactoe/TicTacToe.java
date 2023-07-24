@@ -2,14 +2,17 @@ package com.marinestrada.tictactoe;
 //required packages for importation
 import java.util.Scanner;
 import javax.swing.JPanel;
+import javax.swing.JFrame;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.awt.Font;// to be able to specify fonts
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -96,11 +99,90 @@ public class TicTacToe implements Runnable{
         painter = new Painter();
         painter.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
+        if(!connect()) initializeServer();
+
+        frame = new JFrame();
+        frame.setTitle("Tic-Tac-Toe");
+        frame.setContentPane(painter);
+        frame.setSize(WIDTH, HEIGHT);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setVisible(true);
+
+        thread = new Thread(this, "TicTacToe");
+        thread.start();
+
     }
 
     //required when implemting runable
     public void run() {
+        while(true) {
+            tick();
+            painter.repaint();
+            if(!circle && !accepted) {
+                listenForServerRequest();
+            }
+        }
+    }
 
+    private void render(Graphics g){
+
+    }
+
+    private void tick(){
+        if(errors >= 10) unableToCommunicatewithOpponent = true;
+        
+    }
+
+    private void checkForWin() {
+
+    }
+
+    private void checkForEnemyWin(){
+
+    }
+
+    private void checkForTie() {
+
+    }
+
+    private void listenForServerRequest() {
+        Socket socket = null;
+        try{
+            socket = serverSocket.accept();
+            dos = new DataOutputStream(socket.getOutputStream())
+            dis = new DataInputStream(socket.getInputStream());
+            accepted = true;
+            System.out.println("CLIET REQUESTED TO JOIN, WE HAVE ACCCEPTED");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean connect() {
+        try {
+            socket = new Socket(ip, port);
+            dos = new DataOutputStream(socket.getOutputStream());
+            dis = new DataInputStream(socket.getInputStream());
+            accepted = true;
+        } catch (IOException e) {
+            System.out.println("Unable to connect to address: " + ip + ":"+" | Starting a server");
+            return false;
+        }
+        System.out.println("Successfully connected to the server");
+        return true;
+
+    }
+
+    private void initializeServer() {
+        try{
+            serverSocket = new ServerSocket(port, 8, InetAddress.getByName(ip));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        yourTurn = true;
+        circle = false;
     }
 
     private void loadImages(){
@@ -139,6 +221,33 @@ public class TicTacToe implements Runnable{
 
         @Override
         public void mouseClicked(MouseEvent e){
+            if (accepted) {
+                if(yourTurn && !unableToCommunicatewithOpponent && !won && !enemyWon){
+                    int x = e.getX() / lengthOfSpace;
+                    int y = e.getY() / lengthOfSpace;
+                    int position = x + y*3; // time 3 for proper row
+
+                    if(spaces[position] == null) {
+                        if(!circle) spaces[position] = "X";
+                        else spaces[position] = "O";
+                        yourTurn = false;
+                        repaint();
+                        Toolkit.getDefaultToolkit().sync();
+
+                        try{
+                            dos.writeInt(position);
+                            dos.flush();
+                        }catch(IOException e1){
+                            errors++;
+                            e1.printStackTrace();
+                        }
+
+                        System.out.println("DATA WAS SENT");
+                        checkForWin();
+                        checkForTie();
+                    }
+                }
+            }
         }
 
         @Override
